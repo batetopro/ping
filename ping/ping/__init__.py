@@ -5,4 +5,4 @@ __email__ = 'hristo.i.georgiev@gmail.com'
 __version__ = '0.1.0'
 
 
-from .ping import PingManager, FileService
+from .ping import PingManager, FileService, PingService

@@ -21,3 +21,11 @@ def test_file_service():
     finally:
         os.unlink(path)
 
+def test_ping_service():
+    service = ping.PingService()
+    assert True == service.run("google.com")
+    assert True == service.run("194.153.145.104")
+    assert True == service.run("https://stackoverflow.com/questions/2953462/pinging-servers-in-python")
+    assert True == service.run("https://151.101.65.69/questions/2953462/pinging-servers-in-python")
+    assert False == service.run("http://overthehillsandfarawy.com/")
+    assert False == service.run("129.0.0.1")
