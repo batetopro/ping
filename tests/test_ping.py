@@ -10,12 +10,14 @@ from ping import ping
 
 def test_file_service():
     service = ping.FileService()
-    service.run()
+    path = "hello.out"
+
+    service.run(path)
 
     try:
-        with open(service.path, "r") as fp:
+        with open(path, "r") as fp:
             data = fp.read()
         assert data == service.message
     finally:
-        os.unlink(service.path)
+        os.unlink(path)
 

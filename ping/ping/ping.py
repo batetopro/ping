@@ -1,4 +1,8 @@
 import os
+import logging
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 class FileService:
@@ -8,18 +12,13 @@ class FileService:
             self._message = "Hello"
         return self._message
 
-    @property
-    def path(self):
-        if self._path is None:
-            self._path = "hello.out"
-        return self._path
-
-    def __init__(self, path=None, message=None):
-        self._path = path
+    def __init__(self, message=None):
         self._message = message
 
-    def run(self):
-        with open(self.path, "w") as fp:
+    def run(self, path):
+        LOGGER.info("Writing '{}' to file {}.".format(self.message, path))
+
+        with open(path, "w") as fp:
             fp.write(self.message)
 
 
@@ -33,5 +32,6 @@ class PingManager:
     def __init__(self, file_service=None):
         self._file_service = file_service
 
-    def run(self):
-        self.file_service.run()
+    def run(self, path, url):
+        LOGGER.info("Running manager ...")
+        self.file_service.run(path)
