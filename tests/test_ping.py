@@ -2,23 +2,20 @@
 
 """Tests for `ping` package."""
 
-import pytest
+import os
 
 
 from ping import ping
 
 
-@pytest.fixture
-def response():
-    """Sample pytest fixture.
+def test_file_service():
+    service = ping.FileService()
+    service.run()
 
-    See more at: http://doc.pytest.org/en/latest/fixture.html
-    """
-    # import requests
-    # return requests.get('https://github.com/audreyr/cookiecutter-pypackage')
+    try:
+        with open(service.path, "r") as fp:
+            data = fp.read()
+        assert data == service.message
+    finally:
+        os.unlink(service.path)
 
-
-def test_content(response):
-    """Sample pytest test function with the pytest fixture as an argument."""
-    # from bs4 import BeautifulSoup
-    # assert 'GitHub' in BeautifulSoup(response.content).title.string
