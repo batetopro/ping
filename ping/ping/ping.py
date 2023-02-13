@@ -97,6 +97,10 @@ class PingService:
 
 @dataclasses.dataclass
 class GetResponse:
+    """
+    Container for data received from HttpGetService.
+    """
+
     status_code: int
     content_length: int
     url: str
