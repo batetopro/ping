@@ -19,7 +19,7 @@ class FileService:
     def message(self) -> str:
         """
         Message, which is witten on the file.
-        :return: ste
+        :return: str
         """
         if self._message is None:
             self._message = "Hello"
@@ -120,7 +120,7 @@ class HttpGetService:
         response = requests.get(url)
         result = GetResponse(
             status_code=response.status_code,
-            content_length=response.headers.get("Content-Length", 0),
+            content_length=int(response.headers.get("Content-Length", 0)),
             url=response.url,
         )
         result.log()
