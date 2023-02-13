@@ -2,9 +2,12 @@ import platform
 import subprocess
 import logging
 from urllib.parse import urlparse
+import dataclasses
 
 
-# logging.basicConfig(level=logging.DEBUG)
+import requests
+
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -25,7 +28,7 @@ class FileService:
     def __init__(self, message=None):
         self._message = message
 
-    def _do_write(self, path):
+    def _do_write(self, path) -> None:
         with open(path, "w") as fp:
             fp.write(self.message)
 
@@ -33,7 +36,7 @@ class FileService:
         """
         Run the service using a specified file,
         :param path: str
-        :return: str
+        :return: None
         """
         LOGGER.info("Writing '{}' to file {}.".format(self.message, path))
         self._do_write(path)
@@ -55,7 +58,8 @@ class PingService:
             return parsed_url.path
         return parsed_url.netloc
 
-    def _do_ping(self, host) -> bool:
+    @classmethod
+    def _do_ping(cls, host) -> bool:
         """
         Make a ping to a given host.
         Returns True if host (str) responds to a ping request.
@@ -91,11 +95,42 @@ class PingService:
         return self._do_ping(domain)
 
 
+@dataclasses.dataclass
+class GetResponse:
+    status_code: int
+    content_length: int
+    url: str
+
+    def log(self) -> None:
+        """
+        Log the response.
+        :return: None
+        """
+        LOGGER.info("GET response from '{}' with status code {} and content-length {}.".format(
+            self.url, self.status_code, self.content_length
+        ))
+
+
+class HttpGetService:
+    """
+    Service for making HTTP GET requests to a given URL.
+    """
+    def run(self, url):
+        LOGGER.info("Sending GET request to {} ...".format(url))
+        response = requests.get(url)
+        result = GetResponse(
+            status_code=response.status_code,
+            content_length=response.headers.get("Content-Length", 0),
+            url=response.url,
+        )
+        result.log()
+        return result
+
+
 class PingManager:
     """
     Manager that writes a message to a file, then pings an URL and get the contents of the URL.
     """
-
     @property
     def file_service(self) -> FileService:
         """
@@ -113,22 +148,40 @@ class PingManager:
         :return: PingService
         """
         if self._ping_service is None:
-            self._ping_service = FileService()
+            self._ping_service = PingService()
         return self._ping_service
 
-    def __init__(self, file_service=None, ping_service=None):
+    @property
+    def http_get_service(self) -> HttpGetService:
+        """
+        Get the HttpGetService used by the manager.
+        :return: HttpGetService
+        """
+        if self._http_get_service is None:
+            self._http_get_service = HttpGetService()
+        return self._http_get_service
+
+    def __init__(self, file_service=None, ping_service=None, http_get_service=None):
+        """
+        Initialize the manager
+        :param file_service: FileService
+        :param ping_service: PingService
+        :param http_get_service: HttpGetService
+        """
         self._file_service = file_service
         self._ping_service = ping_service
+        self._http_get_service = http_get_service
 
-    def run(self, path, url) -> None:
+    def run(self, path, url) -> GetResponse:
         """
         Run the manager with specific 'path' and 'url'.
         :param path: str
         :param url: str
-        :return: None
+        :return: GetResponse | None
         """
-
+        result = None
         LOGGER.info("Running manager ...")
         self.file_service.run(path)
         if self.ping_service.run(url):
-            pass
+            result = self.http_get_service.run(url)
+        return result

@@ -1,17 +1,22 @@
 """Console script for ping."""
+import logging
 import argparse
 import sys
 
 
+from ping import PingManager
+
+
 def main():
     """Console script for ping."""
+    logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
     parser = argparse.ArgumentParser()
-    parser.add_argument('_', nargs='*')
+    parser.add_argument("-f", "--file", default="hello.out", help="File to which message is written.")
+    parser.add_argument("url", help="URL which is pinged.")
     args = parser.parse_args()
 
-    print("Arguments: " + str(args._))
-    print("Replace this message by putting your code into "
-          "ping.cli.main")
+    manager = PingManager()
+    manager.run(args.file, args.url)
     return 0
 
 
