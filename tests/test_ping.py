@@ -30,11 +30,15 @@ def test_ping_service():
     assert False == service.run("http://overthehillsandfarawy.com/")
     assert False == service.run("129.0.0.1")
 
+
 def test_http_get_service():
     service = ping.HttpGetService()
     response = service.run("https://docs.python.org/3/howto/argparse.html")
     assert 200 == response.status_code
     assert 0 < response.content_length
+
+    response = service.run("https://docs.python.org/3/howto/argparse.sdfsdf")
+    assert 404 == response.status_code
 
 def test_ping_manager():
     manager = ping.PingManager()

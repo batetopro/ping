@@ -121,7 +121,7 @@ class HttpGetService:
     """
     def run(self, url):
         LOGGER.info("Sending GET request to {} ...".format(url))
-        response = requests.get(url)
+        response = requests.get(url, stream=True)
         result = GetResponse(
             status_code=response.status_code,
             content_length=int(response.headers.get("Content-Length", 0)),
