@@ -77,11 +77,13 @@ class PingService:
         # Building the command. Ex: "ping -c 1 google.com"
         command = ['ping', flag, '1', host]
 
-        result = subprocess.call(command)
+        process = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        LOGGER.info("Ping result for host '{}': {}.".format(host, result))
+        LOGGER.info("Ping result for host '{}': {}.".format(host, process.returncode))
+        LOGGER.info("STDOUT: '{}'.".format(process.stdout.decode()))
+        LOGGER.info("STDERR: '{}'.".format(process.stderr.decode()))
 
-        return result == 0
+        return process.returncode == 0
 
 
     def run(self, url) -> bool:
