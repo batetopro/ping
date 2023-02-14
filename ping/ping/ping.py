@@ -122,6 +122,11 @@ class HttpGetService:
     Service for making HTTP GET requests to a given URL.
     """
     def run(self, url):
+        """
+        Send GET request to the url.
+        :param url: str
+        :return: GetResponse
+        """
         LOGGER.info("Sending GET request to {} ...".format(url))
         response = requests.get(url, stream=True)
         result = GetResponse(
@@ -181,8 +186,8 @@ class PingManager:
     def run(self, path, url) -> GetResponse:
         """
         Run the manager with specific 'path' and 'url'.
-        :param path: str
-        :param url: str
+        :param path: str - where to write the message.
+        :param url: str - address which is pinged.
         :return: GetResponse | None
         """
         result = None
